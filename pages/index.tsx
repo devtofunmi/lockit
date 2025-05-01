@@ -8,12 +8,12 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-100 to-white text-gray-900 px-4 py-6 flex flex-col justify-between">
       {/* Logo */}
-      <h1 className="text-2xl font-bold mb-10 text-blue-600">
+      <h1 className="text-2xl px-4 font-bold mb-10 text-blue-600">
         Lock<span className="text-gray-900">it.</span>
       </h1>
 
       {/* Hero Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-10 px-4 md:px-20 py-12">
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-10 px-4 md:px-20 py-8 md:py-12">
         <section className="max-w-2xl w-full">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-gray-900">
             Secure messaging<br /> built for trust
