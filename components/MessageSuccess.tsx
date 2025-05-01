@@ -22,7 +22,7 @@ type Props = {
           <span className="whitespace-nowrap">{fullUrl}</span>
           <button
             onClick={handleCopy}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md text-sm transition"
+            className="bg-indigo-600 hover:bg-indigo-700 cursor-pointer text-white px-3 py-1 rounded-md text-sm transition"
           >
             Copy
           </button>

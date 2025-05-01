@@ -6,30 +6,30 @@ export default function HomePage() {
   const [link, setLink] = useState<string | null>(null);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-800 px-4 py-5 flex flex-col justify-between">
-      {/* logo */}
-      <h1 className="text-2xl font-bold mb-8 text-indigo-700">
-        Lock<span className="text-black">it.</span>
+    <main className="min-h-screen bg-gradient-to-b from-gray-100 to-white text-gray-900 px-4 py-6 flex flex-col justify-between">
+      {/* Logo */}
+      <h1 className="text-2xl font-bold mb-10 text-blue-600">
+        Lock<span className="text-gray-900">it.</span>
       </h1>
 
       {/* Hero Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-10 px-4 md:px-20 py-10">
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-10 px-4 md:px-20 py-12">
         <section className="max-w-2xl w-full">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-indigo-600 leading-[50px]">
-            Your privacy is<br /> absolute
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-gray-900">
+            Secure messaging<br /> built for trust
           </h1>
-          <p className="text-lg text-gray-600 mb-6">
-            Every message is encrypted on your device using military-grade algorithms before it ever leaves your browser. Not even we can decrypt it.
+          <p className="text-lg text-gray-700">
+            Your messages are end-to-end encrypted directly in your browser using industry-leading standards. Only the recipient can access them—no one else.
           </p>
         </section>
 
         {/* Message Form */}
-        <section className="bg-white rounded-2xl shadow-xl p-8 w-full md:w-[500px] border border-gray-100">
+        <section className="bg-white rounded-xl shadow-md p-8 w-full md:w-[500px] border border-gray-200">
           {link ? (
             <MessageSuccess link={link} />
           ) : (
             <>
-              <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              <h2 className="text-lg font-medium text-gray-800 mb-4">
                 Create a secure message
               </h2>
               <MessageForm
@@ -44,44 +44,40 @@ export default function HomePage() {
 
       {/* How It Works */}
       <section className="mt-24 max-w-5xl mx-auto px-4">
-        <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
+        <h3 className="text-2xl font-semibold text-center text-gray-900 mb-10">
           How Lockit Works
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-gray-600">
-          <div className="bg-indigo-100 p-6 rounded-lg shadow-md">
-            <h4 className="font-semibold mb-1">Write a Message</h4>
-            <p className="text-sm">
-              Type your private message using the secure form.
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center text-gray-700">
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm">
+            <h4 className="font-semibold text-blue-600 mb-2">Write a Message</h4>
+            <p className="text-sm">Type your confidential message using the secure form.</p>
           </div>
-          <div className="bg-indigo-100 p-6 rounded-lg shadow-md">
-            <h4 className="font-semibold mb-1">Get a Shareable Link</h4>
-            <p className="text-sm">You’ll receive a unique link to share.</p>
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm">
+            <h4 className="font-semibold text-blue-600 mb-2">Get a Shareable Link</h4>
+            <p className="text-sm">Receive a unique, private link to share securely.</p>
           </div>
-          <div className="bg-indigo-100 p-6 rounded-lg shadow-md">
-            <h4 className="font-semibold mb-1">Self-Destruct</h4>
-            <p className="text-sm">
-              Once opened, the message is permanently deleted.
-            </p>
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm">
+            <h4 className="font-semibold text-blue-600 mb-2">Self-Destruct</h4>
+            <p className="text-sm">Once opened, the message is deleted permanently.</p>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="mt-24 border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} Lockit — Built for privacy-first sharing.</p>
-        <p className="mt-1">Built with 🖤 by{' '}
-           <a
-             href="https://devtofunmi.vercel.app"
-             target="_blank"
-             rel="noopener noreferrer"
-             className="font-bold hover:underline"
-           >
-             Tofunmi
-           </a></p>
-        </footer>
-
-     
+      <footer className="mt-24 border-t border-gray-200 pt-6 text-center text-sm text-gray-600">
+        <p>&copy; {new Date().getFullYear()} Lockit — Privacy-first messaging for professionals.</p>
+        <p className="mt-1">
+          Built with care by{' '}
+          <a
+            href="https://devtofunmi.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold hover:underline"
+          >
+            Tofunmi
+          </a>
+        </p>
+      </footer>
     </main>
   );
 }

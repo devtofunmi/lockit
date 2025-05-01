@@ -33,7 +33,7 @@ const MessageForm: React.FC<MessageFormProps> = ({ onNewMessage }) => {
       />
       <button
         type="submit"
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition"
+        className="w-full cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition"
       >
         Create Message
       </button>
