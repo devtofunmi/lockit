@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import MessageForm from '@/components/MessageForm';
-import MessageSuccess from '@/components/MessageSuccess';
+import MessageCreated from '@/components/MessageCreated';
+
 
 export default function HomePage() {
-  const [link, setLink] = useState<string | null>(null);
+  const [link, setLink] = useState<{ id: string; key: string } | null>(null);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-100 to-white text-gray-900 px-4 py-6 flex flex-col justify-between">
@@ -24,9 +25,9 @@ export default function HomePage() {
         </section>
 
         {/* Message Form */}
-        <section className="bg-white rounded-xl shadow-md p-8 w-full md:w-[500px] border border-gray-200">
-          {link ? (
-            <MessageSuccess link={link} />
+        <section className="bg-white rounded-xl shadow-md p-5 w-full md:w-[500px] border border-gray-200">
+      {link ? (
+            <MessageCreated messageId={link.id} encryptionKey={link.key} />
           ) : (
             <>
               <h2 className="text-lg font-medium text-gray-800 mb-4">
@@ -34,11 +35,12 @@ export default function HomePage() {
               </h2>
               <MessageForm
                 onNewMessage={(newMessage) => {
-                  setLink(`/message/${newMessage.id}`);
+                  setLink({ id: newMessage.id, key: newMessage.key });
                 }}
               />
             </>
           )}
+
         </section>
       </div>
 
@@ -69,7 +71,7 @@ export default function HomePage() {
         <p className="mt-1">
           Built with care by{' '}
           <a
-            href="https://devtofunmi.vercel.app"
+            href="www.tofunmi.xyz"
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold hover:underline"
