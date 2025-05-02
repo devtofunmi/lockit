@@ -93,10 +93,19 @@ const MessageForm: React.FC<MessageFormProps> = ({ onNewMessage }) => {
     return (
       <>
         <Toaster position="top-right" />
-        <MessageCreated messageId={createdId} encryptionKey={encryptionKey} />
+        <MessageCreated
+          messageId={createdId}
+          encryptionKey={encryptionKey}
+          onCopied={() => {
+            setCreatedId(null);
+            setEncryptionKey(null);
+          }}
+        />
       </>
     );
   }
+  
+  
 
   return (
     <>
