@@ -4,9 +4,10 @@ import toast, { Toaster } from 'react-hot-toast';
 interface MessageCreatedProps {
   messageId: string;
   encryptionKey: string;
+  onCopied: () => void; // ✅ New prop
 }
 
-const MessageCreated: React.FC<MessageCreatedProps> = ({ messageId, encryptionKey }) => {
+const MessageCreated: React.FC<MessageCreatedProps> = ({ messageId, encryptionKey, onCopied }) => {
   const [shareLink, setShareLink] = useState('');
 
   useEffect(() => {
@@ -19,7 +20,7 @@ const MessageCreated: React.FC<MessageCreatedProps> = ({ messageId, encryptionKe
     try {
       await navigator.clipboard.writeText(shareLink);
       toast.success('Link copied to clipboard!');
-      
+      onCopied(); // ✅ Close after copy
     } catch {
       toast.error('Failed to copy link');
     }
@@ -27,7 +28,7 @@ const MessageCreated: React.FC<MessageCreatedProps> = ({ messageId, encryptionKe
 
   return (
     <div className="max-w-xl p-6 bg-white rounded-xl shadow-lg text-center space-y-4">
-        <Toaster position="top-right" />
+      <Toaster position="top-right" />
       <h1 className="text-2xl font-semibold text-green-700">Message Created Successfully</h1>
       <p className="text-gray-700">
         Share this link. The recipient must visit it before it expires. It contains the decryption key.
@@ -44,5 +45,3 @@ const MessageCreated: React.FC<MessageCreatedProps> = ({ messageId, encryptionKe
 };
 
 export default MessageCreated;
-
-
