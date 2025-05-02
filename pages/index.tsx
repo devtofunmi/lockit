@@ -26,20 +26,25 @@ export default function HomePage() {
 
         {/* Message Form */}
         <section className="bg-white rounded-xl shadow-md p-5 w-full md:w-[500px] border border-gray-200">
-      {link ? (
-            <MessageCreated messageId={link.id} encryptionKey={link.key} />
-          ) : (
-            <>
-              <h2 className="text-lg font-medium text-gray-800 mb-4">
-                Create a secure message
-              </h2>
-              <MessageForm
-                onNewMessage={(newMessage) => {
-                  setLink({ id: newMessage.id, key: newMessage.key });
-                }}
-              />
-            </>
-          )}
+        {link ? (
+           <MessageCreated
+             messageId={link.id}
+             encryptionKey={link.key}
+             onCopied={() => setLink(null)}
+           />
+         ) : (
+           <>
+             <h2 className="text-lg font-medium text-gray-800 mb-4">
+              Create a secure message
+             </h2>
+             <MessageForm
+               onNewMessage={(newMessage) => {
+                 setLink({ id: newMessage.id, key: newMessage.key });
+               }}
+             />
+           </>
+         )}
+
 
         </section>
       </div>
