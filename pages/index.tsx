@@ -76,7 +76,7 @@ export default function HomePage() {
         <p className="mt-1">
           Built with care by{' '}
           <a
-            href="www.tofunmi.xyz"
+            href="https://www.tofunmi.xyz"
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold hover:underline"
