@@ -4,7 +4,7 @@ import toast, { Toaster } from 'react-hot-toast';
 interface MessageCreatedProps {
   messageId: string;
   encryptionKey: string;
-  onCopied: () => void; // ✅ New prop
+  onCopied: () => void; 
 }
 
 const MessageCreated: React.FC<MessageCreatedProps> = ({ messageId, encryptionKey, onCopied }) => {
@@ -20,7 +20,7 @@ const MessageCreated: React.FC<MessageCreatedProps> = ({ messageId, encryptionKe
     try {
       await navigator.clipboard.writeText(shareLink);
       toast.success('Link copied to clipboard!');
-      onCopied(); // ✅ Close after copy
+      onCopied(); 
     } catch {
       toast.error('Failed to copy link');
     }
