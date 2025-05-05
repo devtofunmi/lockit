@@ -1,97 +1,76 @@
-// pages/message/[messageId].tsx
+'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
+
+import toast from 'react-hot-toast';
+import { BiCopyAlt, BiLoader } from 'react-icons/bi';
+import { FiAlertTriangle } from 'react-icons/fi';
 
 const MessagePage = () => {
-  const router = useRouter();
-  const { messageId } = router.query;
-
-  const [decrypted, setDecrypted] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const params = useSearchParams();
+  const id = params.get('id');
 
   useEffect(() => {
-    if (!router.isReady || !messageId) return;
-
-    const key = window.location.hash.slice(1); // Get key from #hash
-    if (!key) {
-      setError('Decryption key is missing in the URL.');
+    if (!id) {
+      setError('Invalid link');
+      setLoading(false);
       return;
     }
 
-    const fetchAndDecrypt = async () => {
+    const fetchMessage = async () => {
       try {
-        const res = await fetch(
-          `https://lockit.up.railway.app/message/${messageId}/${key}`
-        );
+        const res = await fetch(`https://your-backend.com/api/messages/${id}`);
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Message not found');
 
-        const [ivBase64, cipherBase64] = data.content.split(':');
-        const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
-        const cipherBytes = Uint8Array.from(atob(cipherBase64), c => c.charCodeAt(0));
-        const keyBytes = Uint8Array.from(atob(key), c => c.charCodeAt(0));
+        if (!res.ok) throw new Error(data.message || 'Message not found');
 
-        const cryptoKey = await crypto.subtle.importKey(
-          'raw',
-          keyBytes,
-          { name: 'AES-GCM' },
-          false,
-          ['decrypt']
-        );
-
-        const decryptedBuffer = await crypto.subtle.decrypt(
-          { name: 'AES-GCM', iv },
-          cryptoKey,
-          cipherBytes
-        );
-
-        const decoded = new TextDecoder().decode(decryptedBuffer);
-        setDecrypted(decoded);
+        setMessage(data.message);
       } catch (err: any) {
-        setError(err.message || 'Failed to decrypt the message.');
+        setError(err.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchAndDecrypt();
-  }, [router.isReady, messageId]);
+    fetchMessage();
+  }, [id]);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(message);
+    toast.success('Message copied to clipboard!');
+  };
 
   return (
-    <div className="min-h-screen bg-gray-800 text-gray-900 px-4 py-6 flex flex-col items-center justify-center">
-      <div className="w-full md:w-[600px] mx-auto p-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg text-center space-y-6">
-        <div className="text-2xl font-bold text-white">Secure Message</div>
+    <div className="min-h-screen bg-gray-900 text-white px-4 py-6 flex flex-col items-center justify-center">
+      <div className="w-full md:w-[600px] p-6 bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl shadow-lg space-y-6 text-center">
+        <div className="text-2xl font-bold">Secure Message</div>
 
-        {error ? (
-          <div className="bg-red-100 p-4 rounded-xl shadow-md">
-            <p className="text-red-600 text-lg font-semibold">{error}</p>
+        {loading ? (
+          <div className="flex items-center justify-center gap-2 text-white">
+            <BiLoader className="animate-spin" />
+            <span>Loading...</span>
           </div>
-        ) : decrypted ? (
-          <div className="bg-white p-6 rounded-xl shadow-md text-left text-gray-900 break-words">
-            <p className="whitespace-pre-wrap">{decrypted}</p>
+        ) : error ? (
+          <div className="text-red-200">
+            <FiAlertTriangle className="mx-auto mb-2" />
+            <p>{error}</p>
           </div>
         ) : (
-          <div className="flex justify-center items-center">
-            <svg
-              className="h-12 w-12 animate-spin text-white"
-              viewBox="0 0 50 50"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+          <>
+            <div className="bg-white text-gray-900 rounded-lg p-4 break-words">
+              {message}
+            </div>
+            <button
+              onClick={copyToClipboard}
+              className="bg-white text-indigo-600 font-semibold px-4 py-2 rounded-xl flex items-center gap-2 mx-auto hover:bg-gray-100 transition"
             >
-              <circle
-                className="opacity-25"
-                cx="25"
-                cy="25"
-                r="20"
-                stroke="currentColor"
-                strokeWidth="5"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M25 5a20 20 0 0 1 20 20h-5a15 15 0 0 0-15-15V5z"
-              />
-            </svg>
-          </div>
+              <BiCopyAlt size={18} /> Copy Message
+            </button>
+          </>
         )}
       </div>
     </div>
