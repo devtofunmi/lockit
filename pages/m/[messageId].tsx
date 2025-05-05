@@ -23,7 +23,7 @@ const MessagePage = () => {
 
     const fetchMessage = async () => {
       try {
-        const res = await fetch(`https://your-backend.com/api/messages/${id}`);
+        const res = await fetch(`https://lockit.up.railway.app/messages/${id}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || 'Message not found');

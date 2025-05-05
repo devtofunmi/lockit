@@ -38,7 +38,7 @@ const MessageForm: React.FC = () => {
         payload.expireAt = expireAt;
       }
 
-      const res = await fetch('https://your-backend-url/messages', {
+      const res = await fetch('https://lockit.up.railway.app/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
