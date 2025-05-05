@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import MessageForm from '@/components/MessageForm';
-import MessageCreated from '@/components/MessageCreated';
+import { useState } from 'react';
+
 
 export default function HomePage() {
-  const [linkId, setLinkId] = useState<string | null>(null);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0f1c] to-[#040711] text-white flex flex-col items-center px-4">
@@ -27,21 +26,7 @@ export default function HomePage() {
 
         {/* Message Form */}
         <section className="mt-10 bg-white/5 backdrop-blur-md p-6 rounded-xl w-full mx-auto shadow-lg border border-white/10">
-          {linkId ? (
-            <MessageCreated
-              messageId={linkId}
-              onCopied={() => setLinkId(null)}
-            />
-          ) : (
-            <>
-              <h2 className="text-lg font-medium text-gray-100 mb-4">
-                Create a secure message
-              </h2>
-              <MessageForm
-                onNewMessage={(newMessage) => setLinkId(newMessage.id)}
-              />
-            </>
-          )}
+         <MessageForm />
         </section>
 
         {/* How It Works */}
