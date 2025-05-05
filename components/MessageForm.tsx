@@ -23,20 +23,26 @@ const MessageForm: React.FC = () => {
       toast.error('Message cannot be empty');
       return;
     }
-
+    if (enablePassword && !password) {
+      toast.error('Password cannot be empty');
+      return;
+    }
     setLoading(true);
 
     try {
       const payload: any = {
         content: messageContent,
-        selfDestruct,
+        burnAfterReading: selfDestruct,
       };
-
-      if (enablePassword && password) payload.password = password;
-      if (expirationMinutes) {
-        const expireAt = new Date(Date.now() + Number(expirationMinutes) * 60000).toISOString();
-        payload.expireAt = expireAt;
+      
+      if (enablePassword && password) {
+        payload.password = password;
       }
+      if (expirationMinutes) {
+        payload.expirationMinutes = Number(expirationMinutes);
+      }
+      
+      
 
       const res = await fetch('https://lockit.up.railway.app/message', {
         method: 'POST',
