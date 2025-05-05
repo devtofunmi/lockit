@@ -2,124 +2,79 @@
 
 import { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import MessageCreated from './MessageCreated';
+import Modal from './SucessModal';
 
-async function encryptMessage(
-  plainText: string
-): Promise<{ encryptedContent: string; encryptionKey: string }> {
-  const key = crypto.getRandomValues(new Uint8Array(16));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-
-  const cryptoKey = await crypto.subtle.importKey(
-    'raw',
-    key,
-    { name: 'AES-GCM' },
-    false,
-    ['encrypt']
-  );
-
-  const encoded = new TextEncoder().encode(plainText);
-  const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, cryptoKey, encoded);
-
-  const base64Iv = btoa(String.fromCharCode(...iv));
-  const base64Cipher = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
-  const base64Key = btoa(String.fromCharCode(...key));
-
-  return {
-    encryptedContent: `${base64Iv}:${base64Cipher}`,
-    encryptionKey: base64Key,
-  };
-}
-
-interface NewMessage {
-  id: string;
-}
-
-interface MessageFormProps {
-  onNewMessage?: (newMessage: NewMessage) => void;
-}
-
-const MessageForm: React.FC<MessageFormProps> = ({ onNewMessage }) => {
+const MessageForm: React.FC = () => {
   const [messageContent, setMessageContent] = useState('');
-  const [createdId, setCreatedId] = useState<string | null>(null);
-  const [encryptionKey, setEncryptionKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const [expiration, setExpiration] = useState<string | null>(null);
+  const [expirationMinutes, setExpirationMinutes] = useState<number | ''>('');
   const [enablePassword, setEnablePassword] = useState(false);
   const [password, setPassword] = useState('');
   const [selfDestruct, setSelfDestruct] = useState(false);
 
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!messageContent.trim()) {
-      toast.error('Message cannot be empty.');
+      toast.error('Message cannot be empty');
       return;
     }
 
     setLoading(true);
 
     try {
-      const { encryptedContent, encryptionKey } = await encryptMessage(messageContent.trim());
-
-      const messageData = {
-        content: encryptedContent,
-        expiration,
-        password: enablePassword ? password : null,
+      const payload: any = {
+        content: messageContent,
         selfDestruct,
       };
 
-      const res = await fetch('https://lockit.up.railway.app/message', {
+      if (enablePassword && password) payload.password = password;
+      if (expirationMinutes) {
+        const expireAt = new Date(Date.now() + Number(expirationMinutes) * 60000).toISOString();
+        payload.expireAt = expireAt;
+      }
+
+      const res = await fetch('https://your-backend-url/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(messageData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
-      if (res.ok) {
-        setCreatedId(data.id);
-        setEncryptionKey(encryptionKey);
-        if (onNewMessage) onNewMessage({ id: data.id });
 
-        toast.success('Message created successfully!');
-        setMessageContent('');
-        setPassword('');
-        setExpiration(null);
-        setEnablePassword(false);
-        setSelfDestruct(false);
-      } else {
-        toast.error(data.error || 'Failed to create message.');
+      if (!res.ok) {
+        toast.error(data.message || 'Something went wrong');
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('Encryption or network error.');
+
+      // Use short ID in the frontend link
+      const link = `${window.location.origin}/msg/${data.id}`;
+      setGeneratedLink(link);
+      setShowModal(true);
+
+      // Reset form
+      setMessageContent('');
+      setPassword('');
+      setEnablePassword(false);
+      setExpirationMinutes('');
+      setSelfDestruct(false);
+    } catch (err) {
+      toast.error('Failed to send message');
     } finally {
       setLoading(false);
     }
   };
-
-  if (createdId && encryptionKey) {
-    return (
-      <>
-        <Toaster position="top-right" />
-        <MessageCreated
-          messageId={createdId}
-          encryptionKey={encryptionKey}
-          onCopied={() => {
-            setCreatedId(null);
-            setEncryptionKey(null);
-          }}
-        />
-      </>
-    );
-  }
 
   return (
     <>
       <Toaster position="top-right" />
       <form onSubmit={handleSubmit} className="space-y-6">
         <textarea
-          className="w-full p-4 border border-gray-300 text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 transition"
+          className="w-full p-4 border border-gray-300 text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 transition bg-transparent"
           placeholder="Enter your secure message..."
           value={messageContent}
           onChange={(e) => setMessageContent(e.target.value)}
@@ -128,13 +83,15 @@ const MessageForm: React.FC<MessageFormProps> = ({ onNewMessage }) => {
 
         <div>
           <label htmlFor="expiration" className="block text-gray-300 mb-1">
-            Expiration Time (optional)
+            Expiration (in minutes, optional)
           </label>
           <input
-            type="time"
+            type="number"
             id="expiration"
-            value={expiration || ''}
-            onChange={(e) => setExpiration(e.target.value)}
+            value={expirationMinutes}
+            min={1}
+            onChange={(e) => setExpirationMinutes(e.target.value ? parseInt(e.target.value) : '')}
+            placeholder="e.g. 10"
             className="w-full p-2 border border-gray-300 rounded-xl shadow-sm"
           />
         </div>
@@ -164,7 +121,7 @@ const MessageForm: React.FC<MessageFormProps> = ({ onNewMessage }) => {
         )}
 
         <div className="flex items-center justify-between">
-          <span className="text-gray-300">Enable Self-Destruct after viewing</span>
+          <span className="text-gray-300">Self-destruct after viewing</span>
           <label className="relative inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
@@ -185,9 +142,12 @@ const MessageForm: React.FC<MessageFormProps> = ({ onNewMessage }) => {
           {loading ? 'Creating...' : 'Create Message'}
         </button>
       </form>
+
+      {showModal && (
+        <Modal link={generatedLink} onClose={() => setShowModal(false)} />
+      )}
     </>
   );
 };
 
 export default MessageForm;
-
