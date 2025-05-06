@@ -1,43 +1,62 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-
+import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { BiCopyAlt, BiLoader } from 'react-icons/bi';
 import { FiAlertTriangle } from 'react-icons/fi';
 
 const MessagePage = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const params = useSearchParams();
-  const id = params.get('id');
+  const [password, setPassword] = useState('');
+  const [showPasswordField, setShowPasswordField] = useState(false);
+  const [hasTriedPassword, setHasTriedPassword] = useState(false);
 
-  useEffect(() => {
-    if (!id) {
+  const router = useRouter();
+  const { messageid } = router.query;
+
+  const fetchMessage = async () => {
+    if (!messageid || typeof messageid !== 'string') {
       setError('Invalid link');
       setLoading(false);
       return;
     }
 
-    const fetchMessage = async () => {
-      try {
-        const res = await fetch(`https://lockit.up.railway.app/messages/${id}`);
-        const data = await res.json();
+    setLoading(true);
+    setError('');
+    setMessage('');
 
-        if (!res.ok) throw new Error(data.message || 'Message not found');
+    try {
+      const url = `https://lockit.up.railway.app/message/${messageid}${password ? `?password=${encodeURIComponent(password)}` : ''}`;
+      const res = await fetch(url);
+      const data = await res.json();
 
-        setMessage(data.message);
-      } catch (err: any) {
-        setError(err.message || 'Something went wrong');
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        if (data.error?.toLowerCase().includes('password')) {
+          setShowPasswordField(true);
+        }
+        throw new Error(data.error || 'Message not found');
       }
-    };
 
-    fetchMessage();
-  }, [id]);
+      setMessage(data.message);
+      setShowPasswordField(false);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+      setHasTriedPassword(true);
+    }
+  };
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (typeof messageid === 'string') {
+      fetchMessage();
+    }
+  }, [router.isReady, messageid]);
+  
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(message);
@@ -55,10 +74,30 @@ const MessagePage = () => {
             <span>Loading...</span>
           </div>
         ) : error ? (
-          <div className="text-red-200">
-            <FiAlertTriangle className="mx-auto mb-2" />
-            <p>{error}</p>
-          </div>
+          <>
+            <div className="text-red-200">
+              <FiAlertTriangle className="mx-auto mb-2" />
+              <p>{error}</p>
+            </div>
+
+            {showPasswordField && (
+              <div className="space-y-4">
+                <input
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg text-black"
+                />
+                <button
+                  onClick={fetchMessage}
+                  className="bg-white text-indigo-600 font-semibold px-4 py-2 rounded-xl hover:bg-gray-100 transition"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <>
             <div className="bg-white text-gray-900 rounded-lg p-4 break-words">
@@ -78,5 +117,3 @@ const MessagePage = () => {
 };
 
 export default MessagePage;
-
-

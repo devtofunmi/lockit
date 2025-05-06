@@ -1,159 +1,126 @@
 'use client';
 
 import { useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import Modal from './SucessModal';
 
-const MessageForm: React.FC = () => {
-  const [messageContent, setMessageContent] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [expirationMinutes, setExpirationMinutes] = useState<number | ''>('');
-  const [enablePassword, setEnablePassword] = useState(false);
+export default function MessageForm() {
+  const [message, setMessage] = useState('');
   const [password, setPassword] = useState('');
-  const [selfDestruct, setSelfDestruct] = useState(false);
-
-  // Modal state
-  const [showModal, setShowModal] = useState(false);
-  const [generatedLink, setGeneratedLink] = useState('');
+  const [expiration, setExpiration] = useState<number | null>(null);
+  const [burnAfterReading, setBurnAfterReading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [link, setLink] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!messageContent.trim()) {
+  
+    if (!message.trim()) {
       toast.error('Message cannot be empty');
       return;
     }
-    if (enablePassword && !password) {
-      toast.error('Password cannot be empty');
-      return;
-    }
+  
     setLoading(true);
-
     try {
-      const payload: any = {
-        content: messageContent,
-        burnAfterReading: selfDestruct,
+      const requestBody: {
+        message: string;
+        expirationMinutes: number | null;
+        burnAfterReading: boolean;
+        password?: string;
+      } = {
+        message,
+        expirationMinutes: expiration,
+        burnAfterReading,
       };
-      
-      if (enablePassword && password) {
-        payload.password = password;
+  
+      if (password.trim()) {
+        requestBody.password = password.trim();
       }
-      if (expirationMinutes) {
-        payload.expirationMinutes = Number(expirationMinutes);
-      }
-      
-      
-
+  
       const res = await fetch('https://lockit.up.railway.app/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(requestBody),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.message || 'Something went wrong');
-        return;
+  
+      const data = await res.text();
+  
+      if (res.ok) {
+        const parsedData = JSON.parse(data);
+        const generatedLink = `${window.location.origin}/m/${parsedData.id}`; // ✅ updated here
+        setLink(generatedLink);
+        toast.success('Message created!');
+      } else {
+        throw new Error(data || 'Something went wrong');
       }
-
-      // Use short ID in the frontend link
-      const link = `${window.location.origin}/msg/${data.id}`;
-      setGeneratedLink(link);
-      setShowModal(true);
-
-      // Reset form
-      setMessageContent('');
-      setPassword('');
-      setEnablePassword(false);
-      setExpirationMinutes('');
-      setSelfDestruct(false);
-    } catch (err) {
-      toast.error('Failed to send message');
+    } catch (err: any) {
+      console.error('Error:', err);
+      toast.error(err.message || 'Error sending message');
     } finally {
       setLoading(false);
     }
   };
+  
+  
+  
+
 
   return (
-    <>
-      <Toaster position="top-right" />
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <textarea
-          className="w-full p-4 border border-gray-300 text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 transition bg-transparent"
-          placeholder="Enter your secure message..."
-          value={messageContent}
-          onChange={(e) => setMessageContent(e.target.value)}
-          rows={5}
+    <div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <textarea
+        rows={5}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type your secret message here..."
+        className="w-full p-4 rounded-lg bg-gray-900 text-white border border-gray-700"
+        required
+      />
+
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Optional password (recipient must know)"
+        className="w-full p-3 rounded-lg bg-gray-900 text-white border border-gray-700"
+      />
+
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <input
+          type="number"
+          value={expiration ?? ''}
+          onChange={(e) => setExpiration(e.target.value ? Number(e.target.value) : null)}
+          placeholder="Expire after (minutes)"
+          className="flex-1 p-3 rounded-lg bg-gray-900 text-white border border-gray-700"
         />
 
-        <div>
-          <label htmlFor="expiration" className="block text-gray-300 mb-1">
-            Expiration (in minutes, optional)
-          </label>
+        <label className="flex items-center gap-2 text-sm">
           <input
-            type="number"
-            id="expiration"
-            value={expirationMinutes}
-            min={1}
-            onChange={(e) => setExpirationMinutes(e.target.value ? parseInt(e.target.value) : '')}
-            placeholder="e.g. 10"
-            className="w-full p-2 border border-gray-300 rounded-xl shadow-sm"
+            type="checkbox"
+            checked={burnAfterReading}
+            onChange={(e) => setBurnAfterReading(e.target.checked)}
           />
-        </div>
+          Burn after reading
+        </label>
+      </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-gray-300">Password Protection</span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={enablePassword}
-              onChange={() => setEnablePassword(!enablePassword)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer-checked:bg-indigo-600 transition-all"></div>
-            <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-full"></div>
-          </label>
-        </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-lg"
+      >
+        {loading ? 'Encrypting...' : 'Create Secure Message'}
+      </button>
 
-        {enablePassword && (
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-xl shadow-sm"
-            placeholder="Enter password"
-          />
-        )}
+      
 
-        <div className="flex items-center justify-between">
-          <span className="text-gray-300">Self-destruct after viewing</span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selfDestruct}
-              onChange={() => setSelfDestruct(!selfDestruct)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer-checked:bg-indigo-600 transition-all"></div>
-            <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-full"></div>
-          </label>
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-indigo-600 cursor-pointer hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl transition"
-        >
-          {loading ? 'Creating...' : 'Create Message'}
-        </button>
-      </form>
-
-      {showModal && (
-        <Modal link={generatedLink} onClose={() => setShowModal(false)} />
-      )}
-    </>
+    </form>
+    {link && (
+  <Modal
+    link={link}
+    onClose={() => setLink('')}
+  />
+)}
+    </div>
   );
-};
-
-export default MessageForm;
+}
