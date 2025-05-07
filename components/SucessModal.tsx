@@ -20,10 +20,10 @@ const Modal: React.FC<ModalProps> = ({ link, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-0 md:px-4">
       <Toaster />
-      <div className="bg-white text-center max-w-md w-full p-6 rounded-2xl shadow-xl relative">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Message Created!</h2>
-        <p className="text-sm text-gray-600 mb-4">Share this secure link:</p>
-        <div className="bg-gray-100 rounded-lg px-3 py-2 text-sm text-gray-800 mb-4 overflow-x-auto whitespace-nowrap">
+      <div className="bg-white/5 backdrop-blur-md text-white text-center max-w-md w-full p-2 md:p-6 rounded-2xl shadow-xl relative">
+        <h2 className="text-xl font-semibold  mb-2">Message Created!</h2>
+        <p className="text-sm  mb-4">Share this secure link:</p>
+        <div className="bg-gray-100 rounded-lg px-1 py-2 text-sm text-gray-800 mb-4 overflow-x-auto whitespace-nowrap">
            {link}
          </div>
 
@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({ link, onClose }) => {
 
         <button
           onClick={onClose}
-          className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-xl font-bold"
+          className="absolute cursor-pointer top-3 right-4 text-gray-400 hover:text-gray-700 text-xl font-bold"
         >
           ×
         </button>
