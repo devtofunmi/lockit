@@ -86,16 +86,21 @@ export default function MessageForm() {
           className="w-full p-3 rounded-lg bg-gray-900 text-white border border-gray-700"
         />
 
-<div className="flex flex-row flex-wrap gap-4 items-center min-w-0">
+<div className="flex flex-row justify-between">
+  <div className='flex items-center gap-2'>
+  <p className='md:text-md text-sm text-gray-300'>Expire in</p>
   <input
     type="number"
     value={expiration ?? ''}
     onChange={(e) => setExpiration(e.target.value ? Number(e.target.value) : null)}
-    placeholder="Expire after (minutes)"
-    className="flex-1 min-w-0 p-3 rounded-lg bg-gray-900 text-white border border-gray-700"
+    placeholder=""
+    className=" p-1 w-12 rounded-lg bg-gray-900 text-white border border-gray-700"
   />
+     <p className='md:text-md text-sm text-gray-300'>minutes</p>
+  </div>
+ 
 
-  <label className="flex items-center gap-3 text-sm cursor-pointer select-none">
+  <label className="flex items-center gap-2 cursor-pointer select-none">
     <div className="relative">
       <input
         type="checkbox"
@@ -114,7 +119,7 @@ export default function MessageForm() {
         }`}
       />
     </div>
-    Burn after reading
+    <p className='md:text-md text-sm text-gray-300'> Self-destruct </p>
   </label>
 </div>
 
