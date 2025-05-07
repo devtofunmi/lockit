@@ -48,7 +48,7 @@ export default function MessageForm() {
   
       if (res.ok) {
         const parsedData = JSON.parse(data);
-        const generatedLink = `${window.location.origin}/m/${parsedData.id}`; // ✅ updated here
+        const generatedLink = `${window.location.origin}/m/${parsedData.id}`; //  updated here
         setLink(generatedLink);
         toast.success('Message created!');
       } else {
@@ -122,7 +122,7 @@ export default function MessageForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-lg"
+          className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-lg"
         >
           {loading ? 'Encrypting...' : 'Create Secure Message'}
         </button>
