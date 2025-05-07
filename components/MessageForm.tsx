@@ -8,7 +8,7 @@ export default function MessageForm() {
   const [message, setMessage] = useState('');
   const [password, setPassword] = useState('');
   const [expiration, setExpiration] = useState<number | null>(null);
-  const [burnAfterReading, setBurnAfterReading] = useState(true);
+  const [burnAfterReading, setBurnAfterReading] = useState(!true);
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState('');
 
@@ -114,7 +114,7 @@ export default function MessageForm() {
             <p className="md:text-md text-sm text-gray-300">minutes</p>
           </div>
 
-          <label className="flex items-center gap-2 cursor-pointer select-none">
+          <label className="flex sm:flex-col items-center gap-2 cursor-pointer select-none">
             <div className="relative">
               <input
                 type="checkbox"
