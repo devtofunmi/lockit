@@ -102,12 +102,12 @@ export default function ViewMessagePage() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full cursor-pointer p-2 border rounded"
+                className="w-full p-2 border rounded"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-2 text-sm text-blue-500"
+                className="absolute cursor-pointer inset-y-0 right-2 text-sm text-blue-500"
               >
                 {showPassword ? 'Hide' : 'Show'}
               </button>
